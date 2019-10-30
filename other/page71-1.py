@@ -1,21 +1,47 @@
-# Example: Design an algorithm to print all permutations of a string.
-# For simplicity, assume all characters are unique.
+# Example: A ransom note can be formed by cutting words out of a magazine to form a new
+# sentence. How would you figure out if a ransom note (represented as a string) can be
+# formed from a given magazine (string)?
 
-def permutations(string):
-    # Base cases
-    if len(string) <= 1:
-        return [string]
-    if len(string) == 2:
-        return [string, string[1] + string[0]]
+# Interpretation: Design an algorithm that checks if a list of strings m contains all
+# occurrances of another list of strings n. If it does, return true, otherwise false.
 
-    # Recursive case
-    results = []
-    lastChar = string[-1]
+import re
 
-    # Insert last character into every position of permutations(string[:-1])
-    for permutation in permutations(string[:-1]):
-        for i in range(len(permutation)):
-            results.append(permutation[0:i] + lastChar + permutation[i:len(permutation)])
-    return results
+def canFormRansomNote(note, magazine):
+    if len(note) > len(magazine):
+        return False
 
-print(permutations("abcdef"))
+    regexDelimiters = r'[,. ]'
+
+    # Build a word count from magazine
+    magazineMap = buildWordCount(re.split(regexDelimiters, magazine))
+
+    # Build a word count from note
+    noteMap = buildWordCount(re.split(regexDelimiters, note))
+
+    # Check if all note word counts fit into magazine word counts
+    for word in list(noteMap):
+        if word not in magazineMap or magazineMap[word] < noteMap[word]:
+            return False
+
+    # All word counts are accounted for and match
+    return True
+
+def buildWordCount(stringList):
+    wordCount = {}
+    for word in stringList:
+        if word not in wordCount:
+            wordCount[word] = 1
+        else:
+            wordCount[word] += 1
+    return wordCount
+
+print(canFormRansomNote("sinister group lurking at holiday", \
+    "There’s a sinister problem lurking in many workplaces \
+    putting people at risk, and one group thinks the way to tackle it is with a \
+    new public holiday."))
+
+print(canFormRansomNote("sinister group will kill", \
+    "There’s a sinister problem lurking in many workplaces \
+    putting people at risk, and one group thinks the way to tackle it is with a \
+    new public holiday."))
